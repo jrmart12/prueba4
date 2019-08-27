@@ -189,15 +189,7 @@ int Parser::parse(int count[4]){
             stack.push_front(nuevo);
         } else if (actual.state != -1) {
             Action temp = lr0_action[actual.state][indexOf(tk)];
-            if (temp.type == ActionType::Shift) {
-                std::cout<<"entroTkSift: "<<tokenToString(tk)<<temp.state<<std::endl;
-                Action nuevo(tk);
-                stack.push_front(nuevo);
-                Action nuevo1(temp.state);
-                stack.push_front(nuevo1);
-                tk = lexer.getNextToken();
-                std::cout<<"TokenNext: "<<tokenToString(tk)<<temp.state<<std::endl;
-            } else if (temp.type == ActionType::Reduce) {
+            if (temp.type == ActionType::Reduce) {
                 std::cout<<"entroTk: "<<tokenToString(tk)<<temp.state<<std::endl;
                 int cant = temp.rule.rhs.size();
                 cant = cant << 1;
@@ -207,20 +199,23 @@ int Parser::parse(int count[4]){
                 stack.push_front(nuevo);
                 if (temp.rule.lhs == rule1.lhs)
                     count[0]++;
-                else if (temp.rule.lhs == rule2.lhs)
-                    count[1]++;
-                else if (temp.rule.lhs == rule3.lhs)
+                else if (temp.rule.rhs == rule2.rhs)
                     count[2]++;
-            } else if (temp.type == ActionType::Accept) {
+                else if (temp.rule.lhs == rule3.lhs)
+                    count[1]++;
+            }else if (temp.type == ActionType::Shift) {
+                std::cout<<"entroTkSift: "<<tokenToString(tk)<<temp.state<<std::endl;
+                Action nuevo(tk);
+                stack.push_front(nuevo);
+                Action nuevo1(temp.state);
+                stack.push_front(nuevo1);
+                tk = lexer.getNextToken();
+                std::cout<<"TokenNext: "<<tokenToString(tk)<<temp.state<<std::endl;
+            }
+            else if (temp.type == ActionType::Accept) {
                 count[3]++;
                 return 1;
-            } else if (temp.type == ActionType::Empty) {
-                throw "error empty action";
             }
-        } else {
-            throw "error at front";
         }
-        
     }
 }
-
